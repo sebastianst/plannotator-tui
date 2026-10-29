@@ -19,6 +19,7 @@ use crate::theme::{Colors, ThemeSetting};
 pub(crate) struct Config {
     pub(crate) herdr: HerdrConfig,
     pub(crate) ui: UiConfig,
+    pub(crate) last: LastConfig,
     pub(crate) keys: Keymap,
     pub(crate) colors: Colors,
 }
@@ -55,6 +56,15 @@ impl Default for UiConfig {
             comment_width: 48,
         }
     }
+}
+
+/// How `plannotator-tui last` finds a session.
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, default)]
+pub(crate) struct LastConfig {
+    /// Claude Code config dirs to also search for a known session id, in order, for agents
+    /// whose `CLAUDE_CONFIG_DIR` does not reach this process. `~/` means the home directory.
+    pub(crate) claude_profile_dirs: Vec<String>,
 }
 
 /// How plannotator-tui opens inside Herdr.
@@ -287,6 +297,13 @@ mod tests {
     fn comment_width_defaults_to_48_and_can_be_set() {
         assert_eq!(Config::default().ui.comment_width, 48);
         assert_eq!(Config::parse("[ui]\ncomment_width = 72\n").expect("parses").ui.comment_width, 72);
+    }
+
+    #[test]
+    fn claude_profile_dirs_default_to_none_and_are_listed_in_order() {
+        assert!(Config::default().last.claude_profile_dirs.is_empty());
+        let config = Config::parse("[last]\nclaude_profile_dirs = [\"~/b\", \"/a\"]\n").expect("parses");
+        assert_eq!(config.last.claude_profile_dirs, ["~/b", "/a"]);
     }
 
     #[test]
