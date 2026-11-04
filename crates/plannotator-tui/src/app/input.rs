@@ -2,7 +2,9 @@
 
 use anyhow::Result;
 use plannotator_tui_schema::Kind;
-use ratatui::crossterm::event::{Event, KeyEvent, KeyEventKind, MouseButton, MouseEvent, MouseEventKind};
+use ratatui::crossterm::event::{
+    Event, KeyEvent, KeyEventKind, KeyModifiers, MouseButton, MouseEvent, MouseEventKind,
+};
 
 use super::compose::ComposeAction;
 use super::menu::ReviewAction;
@@ -72,7 +74,7 @@ impl App {
             Some(Action::QuickOpen) if self.tree.is_none() => {
                 let others: Vec<Action> =
                     keys::GLOBAL.iter().copied().filter(|&action| action != Action::QuickOpen).collect();
-                self.keys.action(&key, &others)
+                self.keys.action(&KeyEvent::new(key.code, KeyModifiers::NONE), &others)
             }
             action => action,
         };
