@@ -40,6 +40,8 @@ pub(crate) struct UiConfig {
     /// Copy a mouse selection to the clipboard on release. Off leaves the clipboard alone
     /// until `copy` (`y`) on the waiting selection.
     pub(crate) copy_on_select: bool,
+    /// Widest the comment box gets, borders included; a narrower pane narrows it further.
+    pub(crate) comment_width: u16,
 }
 
 impl Default for UiConfig {
@@ -50,6 +52,7 @@ impl Default for UiConfig {
             max_width: 0,
             doc_width: 0,
             copy_on_select: true,
+            comment_width: 48,
         }
     }
 }
@@ -278,6 +281,12 @@ mod tests {
             Config::parse("[ui]\nhorizontal_margin = 2\nmax_width = 168\ndoc_width = 120\n").expect("parses");
         assert_eq!((config.ui.horizontal_margin, config.ui.max_width, config.ui.doc_width), (2, 168, 120));
         assert_eq!(Config::parse(&config.to_toml().expect("serializes")).expect("parses"), config);
+    }
+
+    #[test]
+    fn comment_width_defaults_to_48_and_can_be_set() {
+        assert_eq!(Config::default().ui.comment_width, 48);
+        assert_eq!(Config::parse("[ui]\ncomment_width = 72\n").expect("parses").ui.comment_width, 72);
     }
 
     #[test]
