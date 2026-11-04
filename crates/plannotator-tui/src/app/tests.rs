@@ -874,6 +874,13 @@ fn a_and_d_mark_the_selected_block_directly() {
 }
 
 #[test]
+fn ctrl_a_marks_nothing() {
+    let mut app = two_row_paragraph_app();
+    app.handle_event(&key(KeyCode::Char('a'), KeyModifiers::CONTROL)).expect("ctrl+a");
+    assert!(app.open.store.placed().is_empty());
+}
+
+#[test]
 fn repeating_a_mark_on_a_block_adds_nothing() {
     let mut app = two_row_paragraph_app();
     press_char(&mut app, 'a');
@@ -1375,7 +1382,6 @@ fn an_unbound_action_drops_out_of_the_footer() {
 #[test]
 fn a_ctrl_binding_beats_the_plain_key_it_shares_a_letter_with() {
     let mut app = app(Box::new(Discard));
-    // `up` comes before `bottom` in the document, and its plain `k` matches ctrl+k too.
     app.keys = toml::from_str("bottom = [\"ctrl+k\"]\n").expect("keys");
     app.handle_event(&Event::Key(KeyEvent::new(KeyCode::Char('k'), KeyModifiers::CONTROL))).expect("key");
     assert_eq!(app.selected, 1, "ctrl+k goes to the last block instead of up");
